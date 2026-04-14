@@ -16,6 +16,12 @@
 </head>
 <body>
 
+  <!-- Loader -->
+  <div class="loader" id="pageLoader">
+    <span class="loader-name">Dr. Raniere Sousa</span>
+    <span class="loader-title">Ortodontia Avançada</span>
+  </div>
+
   <!-- Scroll Progress Bar -->
   <div class="scroll-progress" aria-hidden="true"></div>
 
@@ -39,6 +45,8 @@
     <section class="hero" id="hero">
       <!-- Deco glow -->
       <div class="deco-glow deco-glow-hero"></div>
+      <!-- Animated grid bg -->
+      <div class="grid-bg" id="gridHero"></div>
 
       <div class="hero-inner">
         <div class="hero-content">
@@ -327,7 +335,9 @@
          SEÇÃO 6: DEPOIMENTOS (antes do Sobre)
          ============================================ -->
     <section class="section section-dark reveal-section" id="depoimentos">
-      <div class="container">
+      <!-- Animated grid bg -->
+      <div class="grid-bg" id="gridDepoimentos"></div>
+      <div class="container" style="position: relative; z-index: 1;">
         <span class="label reveal-el">QUEM JÁ PASSOU POR AQUI</span>
         <h2 class="headline-mask"><span class="section-headline headline-inner">A palavra de quem viveu o processo</span></h2>
         <div class="section-divider"></div>
@@ -543,6 +553,8 @@
          ============================================ -->
     <section class="section section-dark reveal-section" id="cta-final">
       <div class="deco-glow deco-glow-cta"></div>
+      <!-- Animated grid bg -->
+      <div class="grid-bg" id="gridCTA"></div>
       <div class="container container-narrow" style="text-align: center; position: relative; z-index: 1;">
         <h2 class="headline-mask"><span class="section-headline headline-inner">O próximo passo é o diagnóstico</span></h2>
         <p class="section-sub reveal-el" style="color: rgba(245,246,236,0.75);">Agende sua avaliação e entenda o que realmente está acontecendo com o seu caso.</p>

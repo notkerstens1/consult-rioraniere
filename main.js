@@ -5,6 +5,17 @@
 (function () {
   'use strict';
 
+  /* ----------------------------------------
+     LOADER DISMISS
+     ---------------------------------------- */
+  window.addEventListener('load', () => {
+    const loader = document.getElementById('pageLoader');
+    if (!loader) return;
+    setTimeout(() => {
+      loader.classList.add('hidden');
+    }, 900);
+  });
+
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.innerWidth < 768;
 
@@ -241,6 +252,161 @@
       });
     }
   });
+
+  /* ----------------------------------------
+     ANIMATED GRID BACKGROUNDS
+     ---------------------------------------- */
+  function createAnimatedGrid(id, options) {
+    const container = document.getElementById(id);
+    if (!container) return;
+
+    const {
+      numSquares  = 25,
+      maxOpacity  = 0.07,
+      duration    = 1100,
+      cellSize    = 55,
+      color       = '245, 246, 236',
+      mouseReactive = false,
+    } = options || {};
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+
+    // Grid line pattern
+    const defs     = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    const pId      = 'gp-' + id;
+    const pattern  = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+    pattern.setAttribute('id', pId);
+    pattern.setAttribute('width', cellSize);
+    pattern.setAttribute('height', cellSize);
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+
+    const gridPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    gridPath.setAttribute('d', `M ${cellSize} 0 L 0 0 0 ${cellSize}`);
+    gridPath.setAttribute('fill', 'none');
+    gridPath.setAttribute('stroke', `rgba(${color}, 0.07)`);
+    gridPath.setAttribute('stroke-width', '0.5');
+
+    pattern.appendChild(gridPath);
+    defs.appendChild(pattern);
+    svg.appendChild(defs);
+
+    const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bgRect.setAttribute('width', '100%');
+    bgRect.setAttribute('height', '100%');
+    bgRect.setAttribute('fill', `url(#${pId})`);
+    svg.appendChild(bgRect);
+
+    container.appendChild(svg);
+
+    // Auto-animate: random squares flash in/out
+    function animateSquares() {
+      const w    = container.offsetWidth;
+      const h    = container.offsetHeight;
+      if (!w || !h) return;
+
+      const cols = Math.ceil(w / cellSize);
+      const rows = Math.ceil(h / cellSize);
+
+      for (let i = 0; i < numSquares; i++) {
+        setTimeout(() => {
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', Math.floor(Math.random() * cols) * cellSize + 1);
+          rect.setAttribute('y', Math.floor(Math.random() * rows) * cellSize + 1);
+          rect.setAttribute('width',  cellSize - 2);
+          rect.setAttribute('height', cellSize - 2);
+          rect.setAttribute('fill', `rgba(${color}, 0)`);
+          rect.style.transition = `fill ${duration}ms ease`;
+          svg.appendChild(rect);
+
+          requestAnimationFrame(() => {
+            rect.setAttribute('fill', `rgba(${color}, ${maxOpacity})`);
+          });
+
+          setTimeout(() => {
+            rect.setAttribute('fill', `rgba(${color}, 0)`);
+            setTimeout(() => rect.remove(), duration);
+          }, duration);
+        }, i * (duration / numSquares * 2));
+      }
+      setTimeout(animateSquares, duration * 2.5);
+    }
+
+    // Mouse-reactive squares (dark sections only)
+    if (mouseReactive && window.matchMedia('(hover: hover)').matches) {
+      const section       = container.parentElement;
+      const mouseSquares  = [];
+
+      section.addEventListener('mousemove', (e) => {
+        const rect   = container.getBoundingClientRect();
+        const mx     = e.clientX - rect.left;
+        const my     = e.clientY - rect.top;
+        const radius = 140;
+        const col    = Math.floor(mx / cellSize);
+        const row    = Math.floor(my / cellSize);
+
+        for (let dx = -2; dx <= 2; dx++) {
+          for (let dy = -2; dy <= 2; dy++) {
+            const cx   = (col + dx) * cellSize + cellSize / 2;
+            const cy   = (row + dy) * cellSize + cellSize / 2;
+            const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
+            const key  = `${col + dx}-${row + dy}`;
+
+            if (dist < radius && !mouseSquares.find(s => s.key === key)) {
+              const opacity = (1 - dist / radius) * maxOpacity * 3;
+              const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+              r.setAttribute('x', (col + dx) * cellSize + 1);
+              r.setAttribute('y', (row + dy) * cellSize + 1);
+              r.setAttribute('width',  cellSize - 2);
+              r.setAttribute('height', cellSize - 2);
+              r.setAttribute('fill', `rgba(${color}, ${opacity})`);
+              r.style.transition = 'fill 0.25s ease';
+              svg.appendChild(r);
+
+              const sq = { key, el: r };
+              mouseSquares.push(sq);
+
+              setTimeout(() => {
+                r.setAttribute('fill', `rgba(${color}, 0)`);
+                setTimeout(() => {
+                  r.remove();
+                  const idx = mouseSquares.indexOf(sq);
+                  if (idx > -1) mouseSquares.splice(idx, 1);
+                }, 350);
+              }, 500);
+            }
+          }
+        }
+      });
+    }
+
+    // Trigger via IntersectionObserver
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateSquares();
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    obs.observe(container);
+  }
+
+  if (!prefersReducedMotion) {
+    // Hero: subtle telha (warm orange-red) grid on white background
+    createAnimatedGrid('gridHero', {
+      color: '202, 83, 36', numSquares: 18, maxOpacity: 0.05, cellSize: 62, duration: 1300,
+    });
+    // Depoimentos: soft marmore grid on dark background + mouse reactive
+    createAnimatedGrid('gridDepoimentos', {
+      color: '245, 246, 236', numSquares: 18, maxOpacity: 0.07, cellSize: 56, duration: 1100, mouseReactive: true,
+    });
+    // CTA Final: slightly stronger marmore grid + mouse reactive
+    createAnimatedGrid('gridCTA', {
+      color: '245, 246, 236', numSquares: 14, maxOpacity: 0.09, cellSize: 56, duration: 1050, mouseReactive: true,
+    });
+  }
 
   /* ----------------------------------------
      FAQ ACCORDION

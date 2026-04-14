@@ -420,6 +420,8 @@ button { font-family: inherit; border: none; background: none; cursor: pointer; 
   flex-direction: column;
   gap: 48px;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-content {
@@ -980,6 +982,99 @@ button { font-family: inherit; border: none; background: none; cursor: pointer; 
 @keyframes waPulse {
   0% { transform: scale(1); opacity: 0.4; }
   100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ========================================
+   LOADER
+   ======================================== */
+.loader {
+  position: fixed;
+  inset: 0;
+  background: #0a0a0a;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
+}
+
+.loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-name {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #f5f6ec;
+  letter-spacing: 0.12em;
+  animation: loaderPulse 1.4s ease-in-out infinite;
+}
+
+.loader-title {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  animation: loaderPulse 1.4s ease-in-out infinite 0.2s;
+}
+
+@keyframes loaderPulse {
+  0%, 100% { opacity: 0.2; }
+  50%       { opacity: 1; }
+}
+
+/* ========================================
+   ANIMATED GRID BACKGROUND
+   ======================================== */
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.grid-bg svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+/* ========================================
+   AMBIENT GLOW + HERO DECO ANIMATIONS
+   ======================================== */
+@keyframes glowBreath {
+  0%, 100% { opacity: 0.025; }
+  50%       { opacity: 0.055; }
+}
+
+.deco-glow-hero {
+  animation: glowBreath 9s ease-in-out infinite;
+}
+
+@keyframes glowBreathCTA {
+  0%, 100% { opacity: 0.04; }
+  50%       { opacity: 0.09; }
+}
+
+.deco-glow-cta {
+  animation: glowBreathCTA 9s ease-in-out infinite 3s;
+}
+
+@keyframes heroDeco {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.9; }
+  50%       { transform: translate(-50%, -50%) scale(1.06); opacity: 0.55; }
+}
+
+.hero-deco {
+  animation: heroDeco 14s ease-in-out infinite;
 }
 
 /* ========================================
