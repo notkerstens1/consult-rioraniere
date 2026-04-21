@@ -1705,8 +1705,14 @@ body.modal-open {
 }
 
 .caso-modal-slider .ba-slider {
-  aspect-ratio: 4/3;
-  max-height: 52dvh;
+  aspect-ratio: 16/10;
+  max-height: 42dvh;
+}
+
+@media (min-width: 768px) {
+  .caso-modal-slider .ba-slider {
+    max-height: 46dvh;
+  }
 }
 
 .caso-modal-slider-hint {
@@ -1714,43 +1720,6 @@ body.modal-open {
   font-size: 0.8rem;
   color: var(--text-secondary);
   text-align: center;
-}
-
-/* Contador de fotos no header — substitui o hint antigo */
-.caso-modal-photocount {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 14px;
-  padding: 10px 18px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--accent-primary);
-  background: rgba(202, 83, 36, 0.08);
-  border: 1px solid rgba(202, 83, 36, 0.22);
-  border-radius: 999px;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.caso-modal-photocount:hover {
-  background: rgba(202, 83, 36, 0.14);
-  border-color: rgba(202, 83, 36, 0.35);
-  transform: translateY(-1px);
-}
-
-.caso-modal-photocount svg {
-  flex-shrink: 0;
-}
-
-.caso-modal-photocount svg:last-child {
-  animation: photocountArrow 1.8s ease-in-out infinite;
-}
-
-@keyframes photocountArrow {
-  0%, 100% { transform: translateY(0); opacity: 0.6; }
-  50% { transform: translateY(3px); opacity: 1; }
 }
 
 .caso-modal-text {
@@ -1791,17 +1760,129 @@ body.modal-open {
 }
 
 /* Pares antes/depois lado a lado */
-.caso-pairs {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
+/* Header da galeria com título + navegação */
+.caso-gallery-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
 }
 
-@media (min-width: 820px) {
-  .caso-pairs {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+.caso-gallery-nav {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.caso-gallery-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--divider);
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.caso-gallery-btn:hover:not(:disabled) {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.caso-gallery-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Carrossel horizontal */
+.caso-pairs {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-primary) transparent;
+  padding-bottom: 10px;
+  scroll-padding-left: 4px;
+}
+
+.caso-pairs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.caso-pairs::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.caso-pairs::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 8px;
+}
+
+.caso-pairs .caso-pair {
+  flex: 0 0 86%;
+  scroll-snap-align: start;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .caso-pairs .caso-pair {
+    flex: 0 0 58%;
   }
+}
+
+@media (min-width: 900px) {
+  .caso-pairs .caso-pair {
+    flex: 0 0 44%;
+  }
+  .caso-pairs { gap: 16px; }
+}
+
+/* Card com apenas uma foto (extras) */
+.caso-pair-single {
+  grid-template-columns: 1fr !important;
+}
+
+.caso-pair-thumb-full {
+  aspect-ratio: 16/10;
+}
+
+/* Dots de progresso */
+.caso-gallery-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.caso-gallery-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--divider);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.caso-gallery-dot:hover {
+  background: var(--text-secondary);
+}
+
+.caso-gallery-dot.active {
+  background: var(--accent-primary);
+  width: 24px;
+  border-radius: 999px;
 }
 
 .caso-pair {

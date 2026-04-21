@@ -635,48 +635,40 @@
         `;
       }).join('');
 
-      // Sobras
+      // Thumbs únicos das fotos que sobraram (sem par) — entram no mesmo carrossel
       const extraOffset = pairCount * 2;
-      const extraBeforeHtml = Array.from({ length: extraBefore }, (_, i) => {
+      const extraSingleCards = [];
+      for (let i = 0; i < extraBefore; i++) {
         const n = String(pairCount + i + 1).padStart(2, '0');
         const idx = extraOffset + i;
-        return `<button type="button" class="caso-thumb" data-lightbox-index="${idx}" aria-label="Antes — foto adicional ${i + 1}"><img src="assets/casos/${caso.slug}/before/${n}.webp" alt="Antes do tratamento, foto adicional ${i + 1}" loading="lazy" decoding="async"></button>`;
-      }).join('');
-
-      const extraAfterHtml = Array.from({ length: extraAfter }, (_, i) => {
+        extraSingleCards.push(`
+          <div class="caso-pair caso-pair-single" data-pair-index="${pairCount + i}">
+            <button type="button" class="caso-thumb caso-pair-thumb caso-pair-thumb-full" data-lightbox-index="${idx}" aria-label="Foto adicional antes ${i + 1}">
+              <img src="assets/casos/${caso.slug}/before/${n}.webp" alt="Antes — foto adicional ${i + 1}" loading="lazy" decoding="async">
+              <span class="caso-pair-label caso-pair-label-before">Antes</span>
+            </button>
+          </div>
+        `);
+      }
+      for (let i = 0; i < extraAfter; i++) {
         const n = String(pairCount + i + 1).padStart(2, '0');
         const idx = extraOffset + extraBefore + i;
-        return `<button type="button" class="caso-thumb" data-lightbox-index="${idx}" aria-label="Depois — foto adicional ${i + 1}"><img src="assets/casos/${caso.slug}/after/${n}.webp" alt="Depois do tratamento, foto adicional ${i + 1}" loading="lazy" decoding="async"></button>`;
-      }).join('');
+        extraSingleCards.push(`
+          <div class="caso-pair caso-pair-single" data-pair-index="${pairCount + extraBefore + i}">
+            <button type="button" class="caso-thumb caso-pair-thumb caso-pair-thumb-full" data-lightbox-index="${idx}" aria-label="Foto adicional depois ${i + 1}">
+              <img src="assets/casos/${caso.slug}/after/${n}.webp" alt="Depois — foto adicional ${i + 1}" loading="lazy" decoding="async">
+              <span class="caso-pair-label caso-pair-label-after">Depois</span>
+            </button>
+          </div>
+        `);
+      }
+      const extrasHtml = extraSingleCards.join('');
+      const totalCards = pairCount + extraBefore + extraAfter;
 
-      const extrasHtml = (extraBefore || extraAfter) ? `
-        <div class="caso-extras">
-          <h4 class="caso-extras-title">Fotos adicionais</h4>
-          ${extraBefore ? `
-            <div class="caso-gallery-group">
-              <span class="caso-gallery-label caso-gallery-label-before">Antes</span>
-              <div class="caso-thumbs">${extraBeforeHtml}</div>
-            </div>
-          ` : ''}
-          ${extraAfter ? `
-            <div class="caso-gallery-group">
-              <span class="caso-gallery-label caso-gallery-label-after">Depois</span>
-              <div class="caso-thumbs">${extraAfterHtml}</div>
-            </div>
-          ` : ''}
-        </div>
-      ` : '';
-
-      const totalFotos = caso.before + caso.after;
       casoModalContent.innerHTML = `
         <div class="caso-modal-header">
           <span class="caso-modal-tag">${caso.tag}</span>
           <h2 class="caso-modal-title" id="casoModalTitle">${caso.title}</h2>
-          <a href="#casoGallery" class="caso-modal-photocount" data-scroll-to-gallery>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-            <span>${totalFotos} fotos da evolução completa</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-          </a>
         </div>
 
         <div class="caso-modal-slider">
@@ -705,10 +697,22 @@
         </div>
 
         <div class="caso-modal-gallery" id="casoGallery">
-          <h3 class="caso-gallery-title">Evolução foto a foto</h3>
-          <p class="caso-gallery-sub">Cada par mostra a mesma vista clínica antes e depois do tratamento.</p>
-          <div class="caso-pairs">${pairsHtml}</div>
-          ${extrasHtml}
+          <div class="caso-gallery-header">
+            <div>
+              <h3 class="caso-gallery-title">Evolução foto a foto</h3>
+              <p class="caso-gallery-sub">${totalCards} ${totalCards === 1 ? 'registro' : 'registros'} — navegue pelas setas ou arraste</p>
+            </div>
+            <div class="caso-gallery-nav" role="group" aria-label="Navegação da galeria">
+              <button type="button" class="caso-gallery-btn" data-gallery-prev aria-label="Anterior">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button type="button" class="caso-gallery-btn" data-gallery-next aria-label="Próximo">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="caso-pairs" data-gallery-track>${pairsHtml}${extrasHtml}</div>
+          <div class="caso-gallery-dots" data-gallery-dots aria-hidden="true"></div>
         </div>
 
         <div class="caso-modal-cta">
@@ -721,19 +725,6 @@
       // Reset scroll
       if (casoModalScroll) casoModalScroll.scrollTop = 0;
 
-      // Gradiente de fade só quando ainda tem conteúdo abaixo
-      const panel = casoModal.querySelector('.caso-modal-panel');
-      const updateFade = () => {
-        if (!casoModalScroll || !panel) return;
-        const { scrollTop, scrollHeight, clientHeight } = casoModalScroll;
-        const hasMore = scrollTop + clientHeight < scrollHeight - 8;
-        panel.classList.toggle('has-more-content', hasMore);
-      };
-      if (casoModalScroll) {
-        casoModalScroll.addEventListener('scroll', updateFade, { passive: true });
-        requestAnimationFrame(updateFade);
-      }
-
       // Init B/A slider inside modal
       initBASlider(casoModalContent.querySelector('[data-ba-slider]'));
 
@@ -745,19 +736,55 @@
         });
       });
 
-      // Scroll suave pra galeria ao clicar no contador
-      const scrollBtn = casoModalContent.querySelector('[data-scroll-to-gallery]');
-      if (scrollBtn) {
-        scrollBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const gallery = casoModalContent.querySelector('#casoGallery');
-          if (gallery && casoModalScroll) {
-            casoModalScroll.scrollTo({
-              top: gallery.offsetTop - 20,
-              behavior: 'smooth',
-            });
+      // Carrossel horizontal da galeria
+      const track = casoModalContent.querySelector('[data-gallery-track]');
+      const btnPrev = casoModalContent.querySelector('[data-gallery-prev]');
+      const btnNext = casoModalContent.querySelector('[data-gallery-next]');
+      const dotsContainer = casoModalContent.querySelector('[data-gallery-dots]');
+
+      if (track && btnPrev && btnNext) {
+        const cards = track.querySelectorAll('.caso-pair');
+        const cardWidth = () => (cards[0] ? cards[0].getBoundingClientRect().width + 16 : 320);
+
+        // Dots — só mostra se houver mais de 1 card
+        if (dotsContainer && cards.length > 1) {
+          cards.forEach((_, i) => {
+            const dot = document.createElement('span');
+            dot.className = 'caso-gallery-dot';
+            dot.dataset.dotIndex = i;
+            dotsContainer.appendChild(dot);
+          });
+        }
+        const dots = dotsContainer ? dotsContainer.querySelectorAll('.caso-gallery-dot') : [];
+
+        const updateNav = () => {
+          const { scrollLeft, scrollWidth, clientWidth } = track;
+          btnPrev.disabled = scrollLeft <= 2;
+          btnNext.disabled = scrollLeft + clientWidth >= scrollWidth - 2;
+
+          // Atualiza dot ativo
+          if (dots.length) {
+            const activeIdx = Math.round(scrollLeft / cardWidth());
+            dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
           }
+        };
+
+        btnPrev.addEventListener('click', () => {
+          track.scrollBy({ left: -cardWidth(), behavior: 'smooth' });
         });
+        btnNext.addEventListener('click', () => {
+          track.scrollBy({ left: cardWidth(), behavior: 'smooth' });
+        });
+
+        dots.forEach((dot) => {
+          dot.addEventListener('click', () => {
+            const i = parseInt(dot.dataset.dotIndex, 10);
+            track.scrollTo({ left: i * cardWidth(), behavior: 'smooth' });
+          });
+        });
+
+        track.addEventListener('scroll', updateNav, { passive: true });
+        requestAnimationFrame(updateNav);
       }
 
       casoModal.classList.add('open');
