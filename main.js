@@ -667,10 +667,16 @@
         </div>
       ` : '';
 
+      const totalFotos = caso.before + caso.after;
       casoModalContent.innerHTML = `
         <div class="caso-modal-header">
           <span class="caso-modal-tag">${caso.tag}</span>
           <h2 class="caso-modal-title" id="casoModalTitle">${caso.title}</h2>
+          <a href="#casoGallery" class="caso-modal-photocount" data-scroll-to-gallery>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            <span>${totalFotos} fotos da evolução completa</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
         </div>
 
         <div class="caso-modal-slider">
@@ -694,16 +700,11 @@
           <p class="caso-modal-slider-hint">Arraste para comparar antes e depois</p>
         </div>
 
-        <p class="caso-modal-scroll-hint" aria-hidden="true">
-          <span>Continue rolando para ver a evolução completa</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-        </p>
-
         <div class="caso-modal-text">
           <p>${caso.description}</p>
         </div>
 
-        <div class="caso-modal-gallery">
+        <div class="caso-modal-gallery" id="casoGallery">
           <h3 class="caso-gallery-title">Evolução foto a foto</h3>
           <p class="caso-gallery-sub">Cada par mostra a mesma vista clínica antes e depois do tratamento.</p>
           <div class="caso-pairs">${pairsHtml}</div>
@@ -720,6 +721,19 @@
       // Reset scroll
       if (casoModalScroll) casoModalScroll.scrollTop = 0;
 
+      // Gradiente de fade só quando ainda tem conteúdo abaixo
+      const panel = casoModal.querySelector('.caso-modal-panel');
+      const updateFade = () => {
+        if (!casoModalScroll || !panel) return;
+        const { scrollTop, scrollHeight, clientHeight } = casoModalScroll;
+        const hasMore = scrollTop + clientHeight < scrollHeight - 8;
+        panel.classList.toggle('has-more-content', hasMore);
+      };
+      if (casoModalScroll) {
+        casoModalScroll.addEventListener('scroll', updateFade, { passive: true });
+        requestAnimationFrame(updateFade);
+      }
+
       // Init B/A slider inside modal
       initBASlider(casoModalContent.querySelector('[data-ba-slider]'));
 
@@ -730,6 +744,21 @@
           openLightbox(idx);
         });
       });
+
+      // Scroll suave pra galeria ao clicar no contador
+      const scrollBtn = casoModalContent.querySelector('[data-scroll-to-gallery]');
+      if (scrollBtn) {
+        scrollBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const gallery = casoModalContent.querySelector('#casoGallery');
+          if (gallery && casoModalScroll) {
+            casoModalScroll.scrollTo({
+              top: gallery.offsetTop - 20,
+              behavior: 'smooth',
+            });
+          }
+        });
+      }
 
       casoModal.classList.add('open');
       casoModal.setAttribute('aria-hidden', 'false');
