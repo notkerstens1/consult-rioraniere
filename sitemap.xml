@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/0.9">
+  <url>
+    <loc>https://ranieresousa.com.br/</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://ranieresousa.com.br/assets/hero.jpg</image:loc>
+      <image:title>Dr. Raniere Sousa — Ortodontista em Natal/RN</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://ranieresousa.com.br/assets/quem-conduz.jpg</image:loc>
+      <image:title>Dr. Raniere Sousa — Quem conduz o consultório</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://ranieresousa.com.br/politica-privacidade.html</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>
